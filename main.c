@@ -6,6 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <readline/readline.h>
+#include <readline/history.h>
 
 static bool time_out;
 static time_t input_last;
@@ -14,7 +15,7 @@ static time_t input_last;
 /**
  * @brief 未入力時のイベント
  * 			- rl_set_keyboard_input_timeout(int);にて設定可能
- * 			- デフォルト０.1sec
+ * 			- デフォルト0.1sec
  * @return int 
  */
 static int my_rl_event_hook( void )
@@ -47,7 +48,7 @@ void main(void)
 	
 	rl_getc_function = my_rl_getc_function;
 	rl_event_hook = my_rl_event_hook;
-	rl_set_keyboard_input_timeout(10000);	// usec
+	rl_set_keyboard_input_timeout(10 * 1000);	// usec
 
 	input_last = time(NULL);
 	while(true)
@@ -56,6 +57,9 @@ void main(void)
 		if( input == NULL ) break;
 		if( time_out ) break;
 		puts(input);
+		add_history(input);
+		if(input) free(input);
 	}
+	if(input) free(input);
 	puts("end.");
 }
